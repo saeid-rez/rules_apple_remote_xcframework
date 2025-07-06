@@ -1,0 +1,8 @@
+# Ignore Bazel symlinks
+bazel-*
+
+# Ignore Bazel lock files
+**/MODULE.bazel.lock
+
+# Ignore vscode settings
+.vscode

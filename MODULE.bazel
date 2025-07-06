@@ -1,0 +1,7 @@
+module(
+    name = "rules_apple_remote_xcframework",
+    version = "1.0.0",
+)
+
+bazel_dep(name = "bazel_skylib", version = "1.5.0")
+bazel_dep(name = "rules_apple", version = "3.4.0")
