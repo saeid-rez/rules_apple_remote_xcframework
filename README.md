@@ -7,10 +7,10 @@ A Bazel module for consuming remote XCFrameworks for iOS/MacOS applications.
 Add the following to your `MODULE.bazel` file:
 
 ```starlark
-bazel_dep(name = "rules_ios_remote", version = "1.0.0")
+bazel_dep(name = "rules_apple_remote_xcframework", version = "1.0.0")
 
 remote_xcframework = use_extension(
-    "@rules_ios_remote//remote_xcframework:extensions.bzl",
+    "@rules_apple_remote_xcframework//remote_xcframework:extensions.bzl",
     "remote_xcframework_extension",
 )
 
