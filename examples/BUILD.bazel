@@ -1,0 +1,11 @@
+load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
+
+swift_library(
+    name = "test_lib",
+    srcs = [
+        "Test.swift"
+    ],
+    deps = [
+        "@Lottie//:Lottie"
+    ],
+)

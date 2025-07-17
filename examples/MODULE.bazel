@@ -1,0 +1,26 @@
+module(name = "rules_apple_remote_xcframework_example")
+
+bazel_dep(name = "rules_apple_remote_xcframework", version = "0.0.0")
+local_path_override(
+    module_name = "rules_apple_remote_xcframework",
+    path = "..",
+)
+
+bazel_dep(name = "rules_swift", version = "3.1.1", repo_name = "build_bazel_rules_swift")
+
+remote_xcframework = use_extension(
+    "@rules_apple_remote_xcframework//remote_xcframework:extensions.bzl",
+    "remote_xcframework_extension",
+)
+
+remote_xcframework.xcframework(
+    name = "Lottie",
+    url = "https://github.com/airbnb/lottie-ios/releases/download/4.5.2/Lottie.xcframework.zip",
+    sha256 = "92206ff6af80373903767214ac16215838f6da11dedca789c0439299b46b6694",
+    strip_prefix = "",
+)
+
+use_repo(
+    remote_xcframework, 
+    "Lottie"
+)

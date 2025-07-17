@@ -1,3 +1,5 @@
+"""A module extension for importing remote XCFrameworks as Bazel dependencies."""
+
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 def _remote_xcframework_impl(ctx):
@@ -22,7 +24,7 @@ apple_dynamic_xcframework_import(
                 urls = [xcframework.url],
             )
 
-xcframework_tag = tag(
+xcframework_tag = tag_class(
     attrs = {
         "name": attr.string(mandatory = True, doc = "A unique name for the repository."),
         "url": attr.string(mandatory = True, doc = "The URL of the .zip archive containing the XCFramework."),
