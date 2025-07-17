@@ -1,0 +1,64 @@
+name: Create New Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'The version to release (e.g., 1.0.1)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Is this a pre-release? (true/false)'
+        required: false
+        default: 'false'
+        type: boolean
+      draft:
+        description: 'Should the release be a draft? (true/false)'
+        required: false
+        default: 'false'
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Update MODULE.bazel Version
+        run: |
+          sed -i 's/version = ".*"/version = "${{ inputs.version }}"/' MODULE.bazel
+          sed -i 's/compatibility_level = .*/compatibility_level = 1/' MODULE.bazel
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit Version Bump
+        run: |
+          git commit -am "chore(release): Bump version to ${{ inputs.version }}"
+
+      - name: Create Git Tag
+        run: |
+          git tag "v${{ inputs.version }}"
+
+      - name: Push Changes and Tag
+        run: |
+          git push
+          git push --tags
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          body: "Release for version ${{ inputs.version }}"
+          name: "v${{ inputs.version }}"
+          tag_name: "v${{ inputs.version }}"
+          prerelease: ${{ inputs.prerelease }}
+          draft: ${{ inputs.draft }}
