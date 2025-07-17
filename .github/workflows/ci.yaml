@@ -1,0 +1,28 @@
+name: Build and Test
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build_example:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bazel
+        uses: bazel-contrib/setup-bazel@0.15.0
+        with:
+          bazelisk-cache: true
+          disk-cache: ${{ github.workflow }}
+          repository-cache: true
+          bazelrc: |
+            build --color=yes
+            build --show_timestamps
+            common --enable_bzlmod
+
+      - name: Build Example Module
+        run: bazel build //...
+        working-directory: ./examples
