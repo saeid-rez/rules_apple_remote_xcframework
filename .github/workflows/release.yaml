@@ -52,11 +52,20 @@ jobs:
           git push
           git push --tags
 
+      - name: Release Archive
+        run: |
+          git archive \
+            --format=tar.gz \
+            --prefix=rules_apple_remote_xcframework-${{ inputs.version }}/ \
+            -o rules_apple_remote_xcframework.tar.gz \
+            v${{ inputs.version }}
+
       - name: Release
         uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          files: rules_apple_remote_xcframework.tar.gz
           body: "Release for version ${{ inputs.version }}"
           name: "v${{ inputs.version }}"
           tag_name: "v${{ inputs.version }}"
