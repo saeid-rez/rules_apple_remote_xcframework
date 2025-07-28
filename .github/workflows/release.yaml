@@ -31,7 +31,7 @@ jobs:
 
       - name: Update MODULE.bazel Version
         run: |
-          sed -i 's/version = ".*"/version = "${{ inputs.version }}"/' MODULE.bazel
+          sed -i '/module(/{:a;N;/)/!ba;s/version = ".*"/version = "${{ inputs.version }}"/}' MODULE.bazel
           sed -i 's/compatibility_level = .*/compatibility_level = 1/' MODULE.bazel
 
       - name: Configure Git
