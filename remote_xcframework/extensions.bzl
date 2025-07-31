@@ -7,7 +7,7 @@ def _remote_xcframework_impl(ctx):
         for xcframework in module.tags.xcframework:
             target_name = xcframework.name
             build_file_content = """
-load("@build_bazel_rules_apple//apple:apple.bzl", "apple_dynamic_xcframework_import")
+load("@rules_apple//apple:apple.bzl", "apple_dynamic_xcframework_import")
 
 apple_dynamic_xcframework_import(
     name = "{target_name}",
