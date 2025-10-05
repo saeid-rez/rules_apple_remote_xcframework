@@ -30,9 +30,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Update MODULE.bazel Version
-        run: |
-          sed -i '/module(/{:a;N;/)/!ba;s/version = ".*"/version = "${{ inputs.version }}"/}' MODULE.bazel
-          sed -i 's/compatibility_level = .*/compatibility_level = 1,/' MODULE.bazel
+        run: python .github/scripts/update_module_bazel.py ${{ inputs.version }}
 
       - name: Configure Git
         run: |
