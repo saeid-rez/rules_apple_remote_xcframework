@@ -6,15 +6,25 @@ def _remote_xcframework_impl(ctx):
     for module in ctx.modules:
         for xcframework in module.tags.xcframework:
             target_name = xcframework.name
+            framework_type = xcframework.type
+            
+            if framework_type == "static":
+                import_rule = "apple_static_xcframework_import"
+            else:
+                import_rule = "apple_dynamic_xcframework_import"
+            
             build_file_content = """
-load("@rules_apple//apple:apple.bzl", "apple_dynamic_xcframework_import")
+load("@rules_apple//apple:apple.bzl", "{import_rule}")
 
-apple_dynamic_xcframework_import(
+{import_rule}(
     name = "{target_name}",
     visibility = ["//visibility:public"],
     xcframework_imports = glob(["**/*.xcframework/**"]),
 )
-            """.format(target_name = target_name)
+            """.format(
+                target_name = target_name,
+                import_rule = import_rule,
+            )
 
             http_archive(
                 name = xcframework.name,
@@ -30,6 +40,11 @@ xcframework_tag = tag_class(
         "url": attr.string(mandatory = True, doc = "The URL of the .zip archive containing the XCFramework."),
         "sha256": attr.string(mandatory = True, doc = "The SHA256 checksum of the archive."),
         "strip_prefix": attr.string(doc = "A directory prefix to strip from the archive."),
+        "type": attr.string(
+            default = "dynamic",
+            values = ["static", "dynamic"],
+            doc = "Framework type: 'static' for static frameworks, 'dynamic' for dynamic frameworks (default).",
+        ),
     },
     doc = "Declares a single remote XCFramework to be downloaded.",
 )
