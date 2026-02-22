@@ -26,3 +26,6 @@ jobs:
       - name: Build Example Module
         working-directory: ./examples
         run: bazel build :test_lib
+
+      - name: Run Static Framework Test
+        run: bash test_static_framework.sh
