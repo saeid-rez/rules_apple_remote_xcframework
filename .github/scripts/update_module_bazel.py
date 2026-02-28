@@ -8,7 +8,6 @@ def update_module_bazel(version):
     new_module_content = f'''module(
     name = "rules_apple_remote_xcframework",
     version = "{version}",
-    bazel_compatibility = [">=7.0.0"],
     compatibility_level = 1,
 )'''
 
