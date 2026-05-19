@@ -1,0 +1,5 @@
+{
+  "integrity": "",
+  "strip_prefix": "rules_apple_remote_xcframework-{VERSION}",
+  "url": "https://github.com/{OWNER}/{REPO}/releases/download/{TAG}/rules_apple_remote_xcframework.tar.gz"
+}
