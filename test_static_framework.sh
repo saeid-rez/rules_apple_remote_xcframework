@@ -30,7 +30,7 @@ local_path_override(
     path = "$SCRIPT_DIR",
 )
 
-bazel_dep(name = "rules_apple", version = "4.3.3")
+bazel_dep(name = "rules_apple", version = "4.5.3")
 
 remote_xcframework = use_extension(
     "@rules_apple_remote_xcframework//remote_xcframework:extensions.bzl",
