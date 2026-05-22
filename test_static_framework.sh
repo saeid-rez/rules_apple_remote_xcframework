@@ -9,7 +9,7 @@ echo ""
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Set Bazel version from .bazeliskrc
-export USE_BAZEL_VERSION=8.1.1
+export USE_BAZEL_VERSION=9.1.0
 
 # Create a temporary test directory
 TEST_DIR=$(mktemp -d)
@@ -30,7 +30,7 @@ local_path_override(
     path = "$SCRIPT_DIR",
 )
 
-bazel_dep(name = "rules_apple", version = "4.3.3")
+bazel_dep(name = "rules_apple", version = "4.5.3")
 
 remote_xcframework = use_extension(
     "@rules_apple_remote_xcframework//remote_xcframework:extensions.bzl",
