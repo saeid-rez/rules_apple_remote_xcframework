@@ -9,7 +9,7 @@ echo ""
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Set Bazel version from .bazeliskrc
-export USE_BAZEL_VERSION=8.1.1
+export USE_BAZEL_VERSION=9.1.0
 
 # Create a temporary test directory
 TEST_DIR=$(mktemp -d)
