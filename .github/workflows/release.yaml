@@ -64,8 +64,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: rules_apple_remote_xcframework.tar.gz
-          body: "Release for version ${{ inputs.version }}"
           name: "v${{ inputs.version }}"
           tag_name: "v${{ inputs.version }}"
           prerelease: ${{ inputs.prerelease }}
           draft: ${{ inputs.draft }}
+          generate_release_notes: true
