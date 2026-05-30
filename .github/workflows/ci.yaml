@@ -10,6 +10,14 @@ permissions:
 jobs:
   build_example:
     runs-on: macos-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        bazel_version:
+          - 8.x
+          - 9.x
+    env:
+      USE_BAZEL_VERSION: ${{ matrix.bazel_version }}
 
     steps:
       - name: Checkout Repository
@@ -19,7 +27,7 @@ jobs:
         uses: bazel-contrib/setup-bazel@0.19.0
         with:
           bazelisk-cache: true
-          disk-cache: ${{ github.workflow }}
+          disk-cache: ${{ github.workflow }}-${{ matrix.bazel_version }}
           repository-cache: true
           bazelrc: |
             build --color=yes
