@@ -8,8 +8,8 @@ echo ""
 # Get the absolute path to the rules_apple_remote_xcframework directory
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# Set Bazel version from .bazeliskrc
-export USE_BAZEL_VERSION=9.1.0
+# Allow CI or local callers to select the Bazel version.
+export USE_BAZEL_VERSION="${USE_BAZEL_VERSION:-9.x}"
 
 # Create a temporary test directory
 TEST_DIR=$(mktemp -d)
