@@ -2,12 +2,14 @@
 
 A Bazel module for consuming remote XCFrameworks for iOS/MacOS applications.
 
+Tested with Bazel `8.x` and `9.x`.
+
 ## Installation
 
 Add the following to your `MODULE.bazel` file:
 
 ```starlark
-bazel_dep(name = "rules_apple_remote_xcframework", version = "0.4.6")
+bazel_dep(name = "rules_apple_remote_xcframework", version = "1.0.1")
 
 remote_xcframework = use_extension(
     "@rules_apple_remote_xcframework//remote_xcframework:extensions.bzl",
@@ -24,6 +26,8 @@ remote_xcframework.xcframework(
 use_repo(remote_xcframework, "MyRemoteFramework")
 ```
 
+This module depends on `rules_apple` and `rules_swift` and is intended for Bzlmod-based projects.
+
 ## Usage
 
 You can now depend on the downloaded framework in your `swift_library` or `ios_application` targets:
@@ -37,6 +41,8 @@ swift_library(
     ],
 )
 ```
+
+See `examples/` for a working end-to-end example.
 
 ## Framework Types
 
