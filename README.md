@@ -1,6 +1,6 @@
 # rules_apple_remote_xcframework
 
-A Bazel module for consuming remote XCFrameworks for iOS/MacOS applications.
+A Bazel module for consuming remote or local XCFrameworks for iOS/MacOS applications.
 
 Tested with Bazel `8.x` and `9.x`.
 
@@ -26,6 +26,18 @@ remote_xcframework.xcframework(
 use_repo(remote_xcframework, "MyRemoteFramework")
 ```
 
+For a local archive on disk, use an absolute filesystem path instead of `url`:
+
+```starlark
+remote_xcframework.xcframework(
+    name = "MyLocalFramework",
+    path = "/absolute/path/to/MyFramework.xcframework.zip",
+    strip_prefix = "MyFramework-1.2.3",
+)
+
+use_repo(remote_xcframework, "MyLocalFramework")
+```
+
 This module depends on `rules_apple` and `rules_swift` and is intended for Bzlmod-based projects.
 
 ## Usage
@@ -43,6 +55,15 @@ swift_library(
 ```
 
 See `examples/` for a working end-to-end example.
+
+## Source Types
+
+Each `remote_xcframework.xcframework(...)` tag must set exactly one source:
+
+- `url`: remote archive download. `sha256` is required.
+- `path`: absolute filesystem path to a local archive or `.xcframework` directory. `sha256` must be omitted.
+
+Relative paths are not supported.
 
 ## Framework Types
 
@@ -66,8 +87,7 @@ Or explicitly specify `type = "dynamic"`:
 ```starlark
 remote_xcframework.xcframework(
     name = "MyDynamicFramework",
-    url = "https://my.server.com/path/to/MyDynamicFramework.xcframework.zip",
-    sha256 = "...",
+    path = "/absolute/path/to/MyDynamicFramework.xcframework.zip",
     strip_prefix = "MyDynamicFramework-1.0.0",
     type = "dynamic",
 )

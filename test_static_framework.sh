@@ -20,6 +20,9 @@ echo "📦 Using rules_apple_remote_xcframework from: $SCRIPT_DIR"
 echo "🔧 Using Bazel version: $USE_BAZEL_VERSION"
 echo ""
 
+LOCAL_LOTTIE_ARCHIVE="$TEST_DIR/Lottie.xcframework.zip"
+curl -LsSf "https://github.com/airbnb/lottie-ios/releases/download/4.6.0/Lottie.xcframework.zip" -o "$LOCAL_LOTTIE_ARCHIVE"
+
 # Create a minimal MODULE.bazel for testing
 cat > MODULE.bazel << EOF
 module(name = "static_framework_test")
@@ -54,10 +57,18 @@ remote_xcframework.xcframework(
     type = "static",
 )
 
+# Test local archive support without sha256
+remote_xcframework.xcframework(
+    name = "TestLocal",
+    path = "$LOCAL_LOTTIE_ARCHIVE",
+    strip_prefix = "",
+)
+
 use_repo(
     remote_xcframework,
     "TestDynamic",
-    "TestStatic"
+    "TestStatic",
+    "TestLocal"
 )
 EOF
 
@@ -67,15 +78,28 @@ cat > BUILD.bazel << 'EOF'
 EOF
 
 # Fetch the external repositories to trigger BUILD file generation
-bazel fetch @TestDynamic//... @TestStatic//... 2>&1 > /dev/null || true
+if ! bazel fetch @TestDynamic//... @TestStatic//... @TestLocal//... > /dev/null 2>&1; then
+    echo "❌ FAIL: bazel fetch did not complete successfully"
+    exit 1
+fi
 
 echo ""
 echo "📄 Inspecting generated BUILD files:"
 echo ""
 
+EXTERNAL_DIR="$(bazel info output_base)/external"
+
+find_generated_build_file() {
+    local repo_name="$1"
+
+    # Remote repos may be symlinked into Bazel's repository cache, so follow links.
+    find -L "$EXTERNAL_DIR" -path "*remote_xcframework_extension+${repo_name}/BUILD.bazel" 2>/dev/null | head -1
+}
+
 # Find and display the generated BUILD files
-DYNAMIC_BUILD=$(find ~/.bazel/external -path "*remote_xcframework_extension+TestDynamic/BUILD.bazel" 2>/dev/null | head -1)
-STATIC_BUILD=$(find ~/.bazel/external -path "*remote_xcframework_extension+TestStatic/BUILD.bazel" 2>/dev/null | head -1)
+DYNAMIC_BUILD=$(find_generated_build_file "TestDynamic")
+STATIC_BUILD=$(find_generated_build_file "TestStatic")
+LOCAL_BUILD=$(find_generated_build_file "TestLocal")
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🔵 DYNAMIC FRAMEWORK BUILD FILE:"
@@ -110,15 +134,51 @@ fi
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "🟣 LOCAL FRAMEWORK BUILD FILE:"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+if [ -f "$LOCAL_BUILD" ]; then
+    cat "$LOCAL_BUILD"
+    echo ""
+    if grep -q "apple_dynamic_xcframework_import" "$LOCAL_BUILD"; then
+        echo "✅ PASS: Local framework uses apple_dynamic_xcframework_import"
+    else
+        echo "❌ FAIL: Local framework does not use apple_dynamic_xcframework_import"
+    fi
+else
+    echo "⚠️  Local BUILD file not found"
+fi
+
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🎯 Test Summary:"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+PASS=true
+
+if [ ! -f "$DYNAMIC_BUILD" ] || ! grep -q "apple_dynamic_xcframework_import" "$DYNAMIC_BUILD"; then
+    PASS=false
+fi
+
+if [ ! -f "$STATIC_BUILD" ] || ! grep -q "apple_static_xcframework_import" "$STATIC_BUILD"; then
+    PASS=false
+fi
+
+if [ ! -f "$LOCAL_BUILD" ] || ! grep -q "apple_dynamic_xcframework_import" "$LOCAL_BUILD"; then
+    PASS=false
+fi
+
 echo "✅ Framework type detection: Working"
 echo "✅ Build file generation: Working"
 echo "✅ Type attribute: Validated"
+echo "✅ Local absolute path support: Validated"
 echo ""
 echo "🧹 Cleaning up temporary directory: $TEST_DIR"
 cd /
 rm -rf "$TEST_DIR"
+
+if [ "$PASS" != true ]; then
+    echo "❌ FAIL: one or more generated BUILD files did not match expectations"
+    exit 1
+fi
 
 echo ""
 echo "✨ Testing complete!"
